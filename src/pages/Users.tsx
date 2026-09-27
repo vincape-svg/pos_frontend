@@ -22,7 +22,7 @@ type FormData = {
   role_id: string;
 };
 
-const API_URL = "http://localhost:3000";
+const API_URL = "https://atrium-expensive-horse.abasthan.app";
 
 function Users() {
   const [users, setUsers] = useState<User[]>([]);

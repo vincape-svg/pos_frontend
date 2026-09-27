@@ -17,7 +17,7 @@ type TaxForm = {
   rate: string;
 };
 
-const API_URL = "http://localhost:3000";
+const API_URL = "https://atrium-expensive-horse.abasthan.app";
 
 function Taxes() {
   const [taxes, setTaxes] = useState<Tax[]>([]);

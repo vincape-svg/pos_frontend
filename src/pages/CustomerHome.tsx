@@ -26,7 +26,7 @@ function CustomerHome({ onLogout }: CustomerHomeProps) {
       setError("");
 
       const response = await fetch(
-        "http://localhost:3000/api/products",
+        "https://atrium-expensive-horse.abasthan.app/api/products",
         {
           headers: {
             Authorization: `Bearer ${token}`,
