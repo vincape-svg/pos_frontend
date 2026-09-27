@@ -1,3 +1,4 @@
+import { jsPDF } from "jspdf";
 import "./Bill.css";
 import image1 from "../assets/image1.png";
 
@@ -59,23 +60,433 @@ function Bill({
     }).format(numberValue);
   };
 
-  const formatDate = (
-    date: string
-  ) => {
-    return new Date(date).toLocaleString(
-      "id-ID",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const handlePrint = () => {
-    window.print();
+    const productHeight = products.reduce(
+      (total, product) => {
+        const nameLength = product.product_name?.length || 0;
+        const nameLines = Math.max(
+          1,
+          Math.ceil(nameLength / 32)
+        );
+
+        return total + 10 + nameLines * 4;
+      },
+      0
+    );
+
+    const pdfHeight = Math.max(
+      150,
+      125 + productHeight
+    );
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [80, pdfHeight],
+      compress: true,
+    });
+
+    const left = 5;
+    const right = 75;
+    const center = 40;
+
+    let y = 7;
+
+    // LOGO
+    try {
+      pdf.addImage(
+        image1,
+        "PNG",
+        32.5,
+        y,
+        15,
+        15
+      );
+
+      y += 19;
+    } catch {
+      y += 2;
+    }
+
+    // HEADER
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(13);
+
+    pdf.text(
+      "STRUK PEMBAYARAN",
+      center,
+      y,
+      {
+        align: "center",
+      }
+    );
+
+    y += 6;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+
+    pdf.text(
+      "Terima kasih sudah berbelanja",
+      center,
+      y,
+      {
+        align: "center",
+      }
+    );
+
+    y += 5;
+
+    pdf.line(left, y, right, y);
+
+    y += 5;
+
+    // INFORMASI TRANSAKSI
+    pdf.setFontSize(8);
+
+    pdf.text(
+      "No. Transaksi",
+      left,
+      y
+    );
+
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      `#${transaction.id}`,
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.setFont("helvetica", "normal");
+
+    pdf.text(
+      "Tanggal",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatDate(transaction.created_at),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.text(
+      "Kasir",
+      left,
+      y
+    );
+
+    pdf.text(
+      transaction.username || "-",
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.line(left, y, right, y);
+
+    y += 5;
+
+    // PRODUK
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "Produk",
+      left,
+      y
+    );
+
+    y += 5;
+
+    if (products.length === 0) {
+      pdf.setFont("helvetica", "normal");
+
+      pdf.text(
+        "Tidak ada produk",
+        center,
+        y,
+        {
+          align: "center",
+        }
+      );
+
+      y += 6;
+    } else {
+      products.forEach((product) => {
+        const productName =
+          product.product_name || "-";
+
+        const productLines =
+          pdf.splitTextToSize(
+            productName,
+            70
+          );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.text(
+          productLines,
+          left,
+          y
+        );
+
+        y +=
+          productLines.length * 4;
+
+        pdf.setFont(
+          "helvetica",
+          "normal"
+        );
+
+        pdf.text(
+          `${product.quantity} x ${formatRupiah(
+            product.price
+          )}`,
+          left,
+          y
+        );
+
+        pdf.setFont(
+          "helvetica",
+          "bold"
+        );
+
+        pdf.text(
+          formatRupiah(
+            product.subtotal
+          ),
+          right,
+          y,
+          {
+            align: "right",
+          }
+        );
+
+        y += 6;
+      });
+    }
+
+    pdf.line(left, y, right, y);
+
+    y += 5;
+
+    // SUMMARY
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.text(
+      "Subtotal",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatRupiah(
+        transaction.total_before_discount
+      ),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.text(
+      "Diskon",
+      left,
+      y
+    );
+
+    pdf.text(
+      `- ${formatRupiah(
+        transaction.discount
+      )}`,
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.text(
+      transaction.tax_rate
+        ? `Pajak (${transaction.tax_rate}%)`
+        : "Pajak",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatRupiah(
+        transaction.tax_amount
+      ),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.line(left, y, right, y);
+
+    y += 6;
+
+    // TOTAL
+    pdf.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.text(
+      "TOTAL",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatRupiah(
+        transaction.total_after_tax
+      ),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 7;
+
+    pdf.line(left, y, right, y);
+
+    y += 5;
+
+    // PEMBAYARAN
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.setFontSize(8);
+
+    pdf.text(
+      "Metode",
+      left,
+      y
+    );
+
+    pdf.text(
+      transaction.payment_method || "-",
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.text(
+      "Dibayar",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatRupiah(
+        transaction.payment
+      ),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 5;
+
+    pdf.text(
+      "Kembalian",
+      left,
+      y
+    );
+
+    pdf.text(
+      formatRupiah(
+        transaction.change
+      ),
+      right,
+      y,
+      {
+        align: "right",
+      }
+    );
+
+    y += 8;
+
+    // FOOTER
+    pdf.text(
+      "Terima kasih",
+      center,
+      y,
+      {
+        align: "center",
+      }
+    );
+
+    y += 4;
+
+    pdf.text(
+      "Silakan datang kembali",
+      center,
+      y,
+      {
+        align: "center",
+      }
+    );
+
+    // SAVE PDF
+    pdf.save(
+      `struk-${transaction.id}.pdf`
+    );
   };
 
   return (
@@ -93,7 +504,9 @@ function Bill({
 
         {/* HEADER */}
         <div className="bill-header">
-          <h1>STRUK PEMBAYARAN</h1>
+          <h1>
+            STRUK PEMBAYARAN
+          </h1>
 
           <p>
             Terima kasih sudah berbelanja
@@ -108,14 +521,20 @@ function Bill({
         <div className="bill-info">
 
           <div className="bill-info-row">
-            <span>No. Transaksi</span>
+            <span>
+              No. Transaksi
+            </span>
+
             <strong>
               #{transaction.id}
             </strong>
           </div>
 
           <div className="bill-info-row">
-            <span>Tanggal</span>
+            <span>
+              Tanggal
+            </span>
+
             <span>
               {formatDate(
                 transaction.created_at
@@ -124,7 +543,10 @@ function Bill({
           </div>
 
           <div className="bill-info-row">
-            <span>Kasir</span>
+            <span>
+              Kasir
+            </span>
+
             <span>
               {transaction.username}
             </span>
@@ -155,6 +577,7 @@ function Bill({
                 </div>
 
                 <div className="bill-product-detail">
+
                   <span>
                     {product.quantity} x{" "}
                     {formatRupiah(
@@ -167,6 +590,7 @@ function Bill({
                       product.subtotal
                     )}
                   </strong>
+
                 </div>
 
               </div>
@@ -183,17 +607,24 @@ function Bill({
         <div className="bill-summary">
 
           <div className="bill-summary-row">
-            <span>Subtotal</span>
+
+            <span>
+              Subtotal
+            </span>
 
             <span>
               {formatRupiah(
                 transaction.total_before_discount
               )}
             </span>
+
           </div>
 
           <div className="bill-summary-row">
-            <span>Diskon</span>
+
+            <span>
+              Diskon
+            </span>
 
             <span>
               -{" "}
@@ -201,9 +632,11 @@ function Bill({
                 transaction.discount
               )}
             </span>
+
           </div>
 
           <div className="bill-summary-row">
+
             <span>
               Pajak
               {transaction.tax_rate
@@ -216,16 +649,21 @@ function Bill({
                 transaction.tax_amount
               )}
             </span>
+
           </div>
 
           <div className="bill-total-row">
-            <strong>TOTAL</strong>
+
+            <strong>
+              TOTAL
+            </strong>
 
             <strong>
               {formatRupiah(
                 transaction.total_after_tax
               )}
             </strong>
+
           </div>
 
         </div>
@@ -238,39 +676,57 @@ function Bill({
         <div className="bill-payment">
 
           <div className="bill-summary-row">
-            <span>Metode</span>
+
+            <span>
+              Metode
+            </span>
 
             <span>
               {transaction.payment_method ||
                 "-"}
             </span>
+
           </div>
 
           <div className="bill-summary-row">
-            <span>Dibayar</span>
+
+            <span>
+              Dibayar
+            </span>
 
             <span>
               {formatRupiah(
                 transaction.payment
               )}
             </span>
+
           </div>
 
           <div className="bill-summary-row">
-            <span>Kembalian</span>
+
+            <span>
+              Kembalian
+            </span>
 
             <span>
               {formatRupiah(
                 transaction.change
               )}
             </span>
+
           </div>
 
         </div>
 
+        {/* FOOTER */}
         <div className="bill-footer">
-          <p>Terima kasih</p>
-          <p>Silakan datang kembali</p>
+          <p>
+            Terima kasih
+          </p>
+
+          <p>
+            Silakan datang kembali
+          </p>
         </div>
 
       </div>
@@ -291,7 +747,7 @@ function Bill({
           className="bill-print-button"
           onClick={handlePrint}
         >
-          Cetak Struk
+          Simpan PDF
         </button>
 
       </div>
