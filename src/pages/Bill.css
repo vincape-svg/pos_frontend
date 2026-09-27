@@ -1,0 +1,259 @@
+.bill-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 30px 20px;
+  box-sizing: border-box;
+}
+
+.bill {
+  width: 80mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #111111;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+/* LOGO */
+
+.bill-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.bill-logo img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+}
+
+/* HEADER */
+
+.bill-header {
+  text-align: center;
+}
+
+.bill-header h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.bill-header p {
+  margin: 5px 0 0;
+  font-size: 11px;
+}
+
+/* DIVIDER */
+
+.bill-divider {
+  margin: 12px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #333333;
+}
+
+/* INFO */
+
+.bill-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bill-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bill-info-row span:first-child {
+  color: #555555;
+}
+
+/* PRODUCTS */
+
+.bill-products {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bill-product {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bill-product-name {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.bill-product-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.bill-product-detail span {
+  color: #555555;
+}
+
+.bill-empty {
+  margin: 0;
+  padding: 10px 0;
+  text-align: center;
+}
+
+/* SUMMARY */
+
+.bill-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bill-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bill-summary-row span:first-child {
+  color: #555555;
+}
+
+.bill-total-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 5px;
+  padding-top: 8px;
+  border-top: 1px solid #111111;
+  font-size: 14px;
+}
+
+/* PAYMENT */
+
+.bill-payment {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* FOOTER */
+
+.bill-footer {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.bill-footer p {
+  margin: 3px 0;
+  font-size: 11px;
+}
+
+/* BUTTON */
+
+.bill-actions {
+  width: 80mm;
+  max-width: 100%;
+  margin: 15px auto 0;
+  display: flex;
+  gap: 8px;
+}
+
+.bill-actions button {
+  flex: 1;
+  padding: 11px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bill-back-button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+}
+
+.bill-back-button:hover {
+  background: #f9fafb;
+}
+
+.bill-print-button {
+  border: none;
+  background: #111827;
+  color: #ffffff;
+}
+
+.bill-print-button:hover {
+  background: #1f2937;
+}
+
+/* PRINT */
+
+@media print {
+  @page {
+    size: 80mm 180mm;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .bill-page {
+    width: 80mm;
+    min-height: 180mm;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .bill {
+    width: 80mm;
+    max-width: none;
+    margin: 0;
+    padding: 5mm;
+    box-sizing: border-box;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* MOBILE */
+
+@media screen and (max-width: 480px) {
+  .bill-page {
+    padding: 15px 10px;
+  }
+
+  .bill {
+    padding: 15px;
+  }
+
+  .bill-actions {
+    width: 100%;
+  }
+}
