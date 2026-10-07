@@ -42,7 +42,7 @@ interface TransactionProduct {
   subtotal: number | string;
 }
 
-const API_URL = "https://atrium-expensive-horse.abasthan.app";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function App() {
   const token = localStorage.getItem("token");

@@ -13,6 +13,8 @@ interface CustomerHomeProps {
   onLogout: () => void;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function CustomerHome({ onLogout }: CustomerHomeProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ function CustomerHome({ onLogout }: CustomerHomeProps) {
       setError("");
 
       const response = await fetch(
-        "https://atrium-expensive-horse.abasthan.app/api/products",
+        `${API_URL}/api/products`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
