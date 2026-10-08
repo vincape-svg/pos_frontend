@@ -1,0 +1,42 @@
+# ============================
+# NETLIFY CONFIGURATION
+# ============================
+# Deploy frontend POS (React + Vite) ke Netlify.
+# Repo: https://github.com/vincape-svg/pos_frontend
+#
+# PENTING: set environment variables di Netlify UI
+# (Site settings > Environment variables), lalu Trigger deploy:
+#
+#   VITE_API_URL=https://<url-backend-production>
+#   VITE_FIREBASE_API_KEY=<salin dari .env lokal>
+#   VITE_FIREBASE_AUTH_DOMAIN=<salin dari .env lokal>
+#   VITE_FIREBASE_PROJECT_ID=<salin dari .env lokal>
+#   VITE_FIREBASE_APP_ID=<salin dari .env lokal>
+#
+# CATATAN: env Vite di-bake saat BUILD, jadi setiap ganti env
+# di Netlify WAJIB redeploy (Deploys > Trigger deploy).
+# Jangan hardcode URL backend di file ini.
+# ============================
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA fallback: route React Router (mis. /login) dirender index.html.
+# Tanpa ini, buka/refresh route selain "/" = 404 Netlify.
+# (Catatan: JANGAN pakai force = true di rule ini,
+#  karena request file /assets/* ikut di-rewrite ke index.html.)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
